@@ -65,22 +65,29 @@ function findSpecificBrewery(id, callback) {
   });
 }
 
-function renderBreweryInfo(item) {
-  return `
-    <h1>${item.name}</h1>
-    <p>Estbalished in ${item.established}</p>
-    <img src=${item.images.medium}>
-    <h3>${item.description}</h3>
-    <a href="${item.website}">${item.name} Website</a>
-  `;
-}
+// function renderBreweryInfo(item) {
+//   return `
+//     <h1>${item.name}</h1>
+//     <p>Estbalished in ${item.established}</p>
+//     <img src=${item.images.medium}>
+//     <h3>${item.description}</h3>
+//     <a href="${item.website}">${item.name} Website</a>
+//   `;
+// }
 
 function displayBreweryInfo(store) {
   let data = store.data;
   console.log(data);
-  let results = data.data.map(item => {
-    return renderBreweryInfo(item);
-  });
+  let results = `
+  <h1>${data.data.name}</h1>
+  <p>Estbalished in ${data.data.established}</p>
+  <img src=${data.data.images.medium}>
+  <h3>${data.data.description}</h3>
+  <a href="${data.data.website}">${data.data.name} Website</a>
+  `;
+  // let results = data.data.map(item => {
+  //   return renderBreweryInfo(item);
+  // });
   $('.js-brewery-info').html(results);
 }
 $('.js-brewery-results').on('click', 'p', event => {
