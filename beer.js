@@ -3,6 +3,7 @@
 const STORE = {
   zipCode: '90210',
   data: [],
+  data2: [],
   api_key: '756fb33a58f01bbf36b681f1f6dcffa6',
   currentIndex: null
 };
@@ -52,7 +53,7 @@ $('.js-search-form').submit(event => {
 });
 //end of get brewery results
 
-
+//get individual brewery info and beer list
 let FIND_BREWERY_BY_ID = 'https://api.brewerydb.com/v2/brewery/';
 function findSpecificBrewery(id, callback) {
   FIND_BREWERY_BY_ID += id+'/';
@@ -65,19 +66,28 @@ function findSpecificBrewery(id, callback) {
   });
 }
 
-// function renderBreweryInfo(item) {
-//   return `
-//     <h1>${item.name}</h1>
-//     <p>Estbalished in ${item.established}</p>
-//     <img src=${item.images.medium}>
-//     <h3>${item.description}</h3>
-//     <a href="${item.website}">${item.name} Website</a>
-//   `;
-// }
+let FIND_BEERLIST_BY_ID = 'https://api.brewerydb.com/v2/brewery/';
+function findBeerList(id, callback) {
+  FIND_BEERLIST_BY_ID += id+'/beers/';
+  let query = {
+    key: STORE.api_key,
+  };
+  $.getJSON(FIND_BEERLIST_BY_ID, query, function(response) {
+    STORE.data2 = response;
+    displayBeerInfo(STORE);
+  });
+}
+
+function renderBeer(item) {
+  return `
+  <li id=${item.id} class="js-beer">
+    <p>${item.name}</p>
+  </li>    
+`;
+}
 
 function displayBreweryInfo(store) {
   let data = store.data;
-  console.log(data);
   let results = `
   <h1>${data.data.name}</h1>
   <p>Estbalished in ${data.data.established}</p>
@@ -85,17 +95,31 @@ function displayBreweryInfo(store) {
   <h3>${data.data.description}</h3>
   <a href="${data.data.website}">${data.data.name} Website</a>
   `;
-  // let results = data.data.map(item => {
-  //   return renderBreweryInfo(item);
-  // });
   $('.js-brewery-info').html(results);
 }
+
+function displayBeerInfo(store) {
+  let data2 = store.data2;
+  let results2;
+  console.log(data2);
+  if (data2.data) {
+    results2 = data2.data.map((item) => {
+      return renderBeer(item);
+    });
+  } else {
+    results2 = '<p>No beer information available!</p>';
+  }
+  $('.js-beer-list').html(results2);
+}
+
 $('.js-brewery-results').on('click', 'p', event => {
   event.preventDefault();
   STORE.currentIndex = $(event.currentTarget).closest('li').index();
   let index = STORE.currentIndex;
   let id = STORE.data.data[index].brewery.id;
   findSpecificBrewery(id, displayBreweryInfo);
+  findBeerList(id, displayBeerInfo);
   $('.js-brewery-search-page').attr('hidden', true);
   $('.js-brewery-page').removeAttr('hidden'); 
 });
+//end of get individual brewery info and beer list
