@@ -2,9 +2,8 @@
 
 const STORE = {
   zipCode: '90210',
-  data: null,
+  data: [],
   api_key: '756fb33a58f01bbf36b681f1f6dcffa6',
-  BreweryDBurl: 'http://api.brewerydb.com/v2/'
 };
 
 const FIND_BREWERY_BY_ZIP_URL = 'https://api.brewerydb.com/v2/locations/';
@@ -21,17 +20,25 @@ function findBreweriesFromAPI(zipcode, callback) {
 
 function renderBreweries(item) {
   return `
-    <li id={item.id}>
-      <a href="#">{item.name}</a>
-    </li>
+    <ul>
+      <li id=${item.id}>
+        <a href="#">${item.name}, ${item.streetAddress}, ${item.locality}</a>
+      </li>
+    </ul>
   `;
 }
 
 function displayBreweriesFromAPI(store) {
+  let results;
   const data = store.data;
-  const results = data.results.map((item) => {
-    return renderBreweries(item);
-  });
+  console.log(data);
+  if (data.data) {
+    results = data.data.map((item) => {
+      return renderBreweries(item);
+    });
+  } else {
+    results = '<p>No breweries found in that zip code!</p>';
+  }
   $('.js-brewery-results').html(results);
 }
 
