@@ -64,6 +64,7 @@ function findSpecificBrewery(id, callback) {
     STORE.data = response;
     displayBreweryInfo(STORE);
   });
+  FIND_BREWERY_BY_ID = FIND_BREWERY_BY_ID.slice(0, 38);
 }
 
 let FIND_BEERLIST_BY_ID = 'https://api.brewerydb.com/v2/brewery/';
@@ -74,8 +75,9 @@ function findBeerList(id, callback) {
   };
   $.getJSON(FIND_BEERLIST_BY_ID, query, function(response) {
     STORE.data2 = response;
-    displayBeerInfo(STORE);
+    displayBeerList(STORE);
   });
+  FIND_BEERLIST_BY_ID = FIND_BEERLIST_BY_ID.slice(0, 38);
 }
 
 function renderBeer(item) {
@@ -98,10 +100,9 @@ function displayBreweryInfo(store) {
   $('.js-brewery-info').html(results);
 }
 
-function displayBeerInfo(store) {
+function displayBeerList(store) {
   let data2 = store.data2;
   let results2;
-  console.log(data2);
   if (data2.data) {
     results2 = data2.data.map((item) => {
       return renderBeer(item);
@@ -118,8 +119,63 @@ $('.js-brewery-results').on('click', 'p', event => {
   let index = STORE.currentIndex;
   let id = STORE.data.data[index].brewery.id;
   findSpecificBrewery(id, displayBreweryInfo);
-  findBeerList(id, displayBeerInfo);
+  findBeerList(id, displayBeerList);
   $('.js-brewery-search-page').attr('hidden', true);
   $('.js-brewery-page').removeAttr('hidden'); 
 });
 //end of get individual brewery info and beer list
+
+//get individual beer info
+let FIND_BEER_BY_ID = 'https://api.brewerydb.com/v2/beer/';
+function findSpecificBeer(id, callback) {
+  FIND_BEER_BY_ID += id+'/';
+  let query = {
+    key: STORE.api_key,
+  };
+  $.getJSON(FIND_BEER_BY_ID, query, function(response) {
+    STORE.data = response;
+    displayBeerInfo(STORE);
+  });
+  FIND_BEER_BY_ID = FIND_BEER_BY_ID.slice(0, 35);
+}
+
+function displayBeerInfo(store) {
+  let data = store.data;
+  let results;
+  if (data.data.descrition) {
+    results = `
+      <h1>${data.data.name}</h1>
+      <p>ABV ${data.data.abv}%, IBU ${data.data.ibu}</p>
+      <p>Availability: ${data.data.available.description}</p>
+      <img src=${data.data.labels.medium}>
+      <h3>${data.data.description}</h3>
+    `;
+  } else {
+    results = `
+      <h1>${data.data.name}</h1>
+      <p>ABV ${data.data.abv}%, IBU ${data.data.ibu}</p>
+      <p>Availability: ${data.data.available.description}</p>
+      <img src=${data.data.labels.medium}>
+    `;
+  }
+  $('.js-beer-info').html(results);
+}
+
+$('.js-beer-list').on('click', 'p', event => {
+  event.preventDefault();
+  STORE.currentIndex = $(event.currentTarget).closest('li').index();
+  let index = STORE.currentIndex;
+  let id = STORE.data2.data[index].id;
+  findSpecificBeer(id, displayBeerInfo);
+  $('.js-brewery-page').attr('hidden', true);
+  $('.js-beer-page').removeAttr('hidden'); 
+});
+//end of get individual beer info
+
+$('.js-go-homepage').click(event => {
+  event.preventDefault();
+  $('.js-homepage').removeAttr('hidden');
+  $('.js-brewery-search-page').attr('hidden', true);
+  $('.js-brewery-page').attr('hidden', true);
+  $('.js-beer-page').attr('hidden', true);
+})
